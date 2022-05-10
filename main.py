@@ -7,7 +7,7 @@ from src.LogHelper import Logger
 from src.telegram_client import TelegramClient
 
 app_config = AppConfig()
-app = Client(app_config.session, app_config.api_id, app_config.api_hash)
+app = Client(name="telegram_forwarder", session_string=app_config.session, api_id=app_config.api_id, api_hash=app_config.api_hash)
 telegram_client = TelegramClient(app)
 
 from_chats = telegram_client.get_formatted_chats(app_config.from_chats)
@@ -21,9 +21,12 @@ def run(client, message):
     Logger.info(f"Message Incoming - from {message.sender_chat.title}")
     try:
         for chat in to_chats:
-            message.forward(chat)
+            Logger.info(message)
+            if not message.chat.has_protected_content:
+                message.forward(chat)
+            else:
+                app.send_message(chat_id=chat, text=message.text)
     except Exception as e:
         Logger.error(e)
-
 
 app.run()
