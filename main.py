@@ -18,14 +18,14 @@ Logger.info(f"To chats - {to_chats}")
 
 @app.on_message(filters.chat(from_chats) & filters.incoming)
 def run(client, message):
-    Logger.info(f"Message Incoming - from {message.sender_chat.title}")
+    Logger.info(f"Message Incoming - from {message.sender_chat.id, message.sender_chat.title}")
     try:
         for chat in to_chats:
 #            Logger.info(message)
             if not message.chat.has_protected_content:
                 message.forward(chat)
             else:
-                app.send_message(chat_id=chat, text=message.text)
+                app.send_message(chat_id=chat, text = [message.sender_chat.id, message.sender_chat.title, message.text])
     except Exception as e:
         Logger.error(e)
 
